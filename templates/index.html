@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Selenium Agent — UI</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; }
+      .box { border: 1px solid #ddd; padding: 12px; margin-bottom: 12px; }
+      textarea { width: 100%; min-height: 200px; }
+      .tasks { max-height: 200px; overflow: auto; }
+      .flash { padding: 8px; margin-bottom: 8px; border-radius: 4px; }
+      .flash.info { background: #e8f4ff; }
+      .flash.error { background: #ffe8e8; }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Selenium Agent UI</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash {{cat}}">{{msg}}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="box">
+      <form method="post" action="/dump">
+        <label>Website URL:</label><br />
+        <input type="text" name="url" style="width:70%" placeholder="https://example.com" />
+        <button type="submit">Dump UI</button>
+      </form>
+
+      <form method="post" action="/run-agent" style="margin-top:8px;">
+        <input type="hidden" name="url" value="" id="agent-url" />
+        <label>Or run agent for:</label>
+        <input type="text" name="url" placeholder="https://example.com" style="width:60%" />
+        <button type="submit">Run Agent</button>
+      </form>
+
+      <form method="post" action="/run-script" style="margin-top:8px;">
+        <button type="submit">Run Selenium Script</button>
+      </form>
+    </div>
+
+    <div class="box">
+      <h3>Last Task Log</h3>
+      <div class="tasks">
+        {% if tasks %}
+          <ul>
+            {% for t in tasks %}
+              <li><strong>{{t.time}}</strong> — {{t.task}} — <pre style="display:inline">{{t.result}}</pre></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No tasks yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>ui_dump.json</h3>
+      <textarea readonly>{{ ui_json }}</textarea>
+    </div>
+
+    <div class="box">
+      <h3>selenium_action_script.py</h3>
+      <textarea readonly>{{ script }}</textarea>
+    </div>
+
+    <script>
+      // simple helper: copy the input url to the hidden agent-url if user focuses
+      document.querySelector('input[name="url"]').addEventListener('input', function(e){
+        var h = document.getElementById('agent-url'); if (h) h.value = e.target.value;
+      });
+    </script>
+  </body>
+</html>

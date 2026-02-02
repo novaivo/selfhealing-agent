@@ -1,0 +1,5 @@
+flask
+langchain
+langsmith
+selenium
+python-dotenv
